@@ -192,3 +192,5 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignoreflash-chat-6a0ea-firebase-adminsdk-mg99h-d84089ef89.json
+
+node_modules

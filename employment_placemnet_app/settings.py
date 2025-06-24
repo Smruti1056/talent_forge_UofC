@@ -169,7 +169,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'talent_forge_frontend', 'dist'),
 ]
 
-
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Default primary key field type
