@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Job Seeker Profile{% endblock %}
+
+{% block content %}
+  <div id="root"></div>
+  {% if debug %}
+    <script type="module" src="http://localhost:5173/src/main.tsx"></script>
+  {% else %}
+    <script type="module" src="{% static 'main.js' %}"></script>
+  {% endif %}
+{% endblock %}

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth  import get_user_model
 from django.conf import settings
 from .models import CustomUser
+from employeer.models import EmployerProfile
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import pyotp
@@ -45,7 +46,17 @@ def home_view(request):
 @login_required
 def profile_view(request):
     user = request.user
+    if user.user_type == '2':
+        if not hasattr(user, 'employer_profile'):
+            return redirect('create_employer_profile')
+        else:
+           return redirect('employer_dashboard')
+    elif user.user_type == '1':
+        if not hasattr(user, 'jobseekerprofile'):
+            print("TEST JOB SEEKER")
+            return redirect('create_jobseeker_profile')
     qr_code_data_uri = generate_otp(user)
+    is_employer = hasattr(user, 'employerprofile')
 
     return render(request, 'profile.html', {"qrcode": qr_code_data_uri})
 
@@ -64,21 +75,24 @@ def verify_mfa(request):
         user_id = request.POST.get('user_id')
         if not user_id:
             messages.error(request, 'Invalid parameters. Please try again.')
+
             return render(request,'otp_verify.html', {'user_id': user_id})
         user = get_object_or_404(CustomUser, id=user_id)
         if verify_2fa_otp(user, otp):
             if request.user.is_authenticated:
                 messages.success(request, '2FA enabled successfully !')
-                return redirect('profile')
 
+                return redirect('profile')
             login(request, user)
             messages.success(request, 'Login successful!')
             return redirect('profile')
         else:
             if request.user.is_authenticated:
                 messages.error(request, 'Invalid OTP code. Please try again.')
+
                 return redirect('profile')
             messages.error(request, 'Invalid OTP code. Please try again.')
+
             return render(request,'otp_verify.html', {'user_id': user_id})
        
     return render(request,'otp_verify.html', {'user_id': user_id})
@@ -140,11 +154,7 @@ def signup_view(request, user_type):
             messages.error(request, 'Email is already in use. Please try another.')
             return render(request, 'signup.html', context)
         # Create the new user
-        user = CustomUser.objects.create_user(username=email, email=email, password=password1, mfa_enabled = True)
-        if user_type == 1:
-            messages.info(request, 'A new Job Seeker has been created')
-        elif user_type == 2:
-            messages.info(request, 'A new Employeer has been created')
+        user = CustomUser.objects.create_user(username=email, email=email, password=password1, mfa_enabled = True, user_type=user_type)
         user.save()
         messages.success(request, 'Sign up successful! You can now activate the MFA in your account.')
         request.session['mfa_user_id'] = user.id

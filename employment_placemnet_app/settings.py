@@ -35,6 +35,7 @@ DATABASE_URL = 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq
 DEBUG = True
 
 ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
+#ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -45,17 +46,33 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # Custom apps
     'user',
+    'employeer',
+    'job_seeker',
     # Third-party apps
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'storages',
+    # Correct way to add Django REST Framework
+    'rest_framework',
+    # Correct way to add Django CORS Headers
+    'corsheaders',
 ]
 
+# Bucket configuration
+GS_BUCKET_NAME = 'flash-chat-6a0ea.appspot.com'  # Replace with your bucket name
+GS_PROJECT_ID = 'flash-chat-6a0ea'    # Replace with your project ID
+GS_CREDENTIALS = 'flash-chat-6a0ea-firebase-adminsdk-mg99h-d84089ef89.json'  # Path to your service account key file.  Use environment variables in production.
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+# If you are serving static files from GCS as well
+# STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/' #Ensure this is set
+# STATIC_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/static/' #If serving static files
+
 AUTHENTICATION_BACKENDS = [
-    
+
     'allauth.account.auth_backends.AuthenticationBackend', 
 ]
 
@@ -63,7 +80,7 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL =  "user.CustomUser"
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # 'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -91,7 +108,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'employment_placemnet_app.wsgi.application'
+#WSGI_APPLICATION = 'employment_placemnet_app.wsgi.application'
 
 SOCIALACCOUNT_LOGIN_ON_GET=True
 LOGIN_REDIRECT_URL = 'success'
@@ -139,13 +156,16 @@ DOMAIN = 'http://localhost:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-# STATIC_URL = 'static/'
 # Tell Django where to put “collected” static files
+# STATIC_URL = '/static/'
 # STATIC_ROOT = BASE_DIR / "static"
-
-STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'talent_forge_frontend' / 'dist',  # ✅ matches actual React build folder
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
