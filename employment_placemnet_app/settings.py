@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-v9ih(vmg)((b7ysd*1s%lz&vxlz$uxnbxfz+q#74(q2&#aa3vs'
+#SECRET_KEY = 'django-insecure-v9ih(vmg)((b7ysd*1s%lz&vxlz$uxnbxfz+q#74(q2&#aa3vs'
 # DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 
@@ -34,8 +34,8 @@ DATABASE_URL = 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
-#ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     'storages',
     # Correct way to add Django REST Framework
     'rest_framework',
+    # Django Widjets
+    'widget_tweaks',
     # Correct way to add Django CORS Headers
     'corsheaders',
 ]
@@ -161,10 +163,11 @@ DOMAIN = 'http://localhost:8000'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 # Tell Django where to put “collected” static files
 STATIC_URL = '/static/'
-# STATIC_ROOT = BASE_DIR / "static"
+#STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 #STATICFILES_DIRS = [
+#    BASE_DIR / 'static',
 #    BASE_DIR / 'talent_forge_frontend' / 'dist',  # ✅ matches actual React build folder
 #]
 

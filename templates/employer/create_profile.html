@@ -3,22 +3,93 @@
 {% block title %}Employer Registration{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2>Employer Registration</h2>
-  <form method="POST" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    <h4>Company Profile</h4>
-    {% for field in profile_form %}
-      <div class="mb-3">
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <div class="text-danger small">{{ field.errors|join:", " }}</div>
-        {% endif %}
-      </div>
-    {% endfor %}
+<div class="container">
+  <div class="row justify-content-center" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="col-lg-6 col-md-8">
+        <div class="bg-white rounded-3 shadow p-5" style="color: black;">
+          <h2>Employer Registration</h2>
+          <hr style="background-color: white; height: 1px;">
+          {% load widget_tweaks %}
+          <form method="post" enctype="multipart/form-data"> {# Add enctype for file uploads (logo) #}
+              {% csrf_token %}
 
-    <button type="submit" class="btn btn-primary">Register</button>
-  </form>
+              {# Loop through form fields for the employer profile #}
+              {% for field in profile_form %}
+                  <div class="form-group mb-3">
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                      
+                      {# Apply form-control class to the input field using render_field #}
+                      {% render_field field class="form-control" %} 
+
+                      {% if field.help_text %}
+                          <small class="form-text text-muted">{{ field.help_text }}</small>
+                      {% endif %}
+                      {% if field.errors %}
+                          <div class="text-danger small">
+                              {% for error in field.errors %}
+                                  <div>{{ error }}</div>
+                              {% endfor %}
+                          </div>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+
+              {# --- Terms of Service Section --- #}
+              <div class="mb-4 p-3 border rounded bg-light" style="color: black;"> {# Ensure text is black if parent style is white #}
+                  <h3 class="mb-3">Terms of Service</h3>
+                  <div class="terms-scroll-box mb-3 p-3 border rounded bg-white" style="max-height: 200px; overflow-y: auto;">
+                      {# Replace this with your actual Terms of Service content #}
+                      <p>
+                        By registering as an employer, you agree to the following terms and conditions:
+                      </p>
+                      <p>
+                        1. **Account Responsibilities:** You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account.
+                      </p>
+                      <p>
+                        2. **Job Postings:** All job postings must be accurate, non-discriminatory, and comply with all applicable laws and regulations. We reserve the right to remove any postings deemed inappropriate or in violation of these terms.
+                      </p>
+                      <p>
+                        3. **Candidate Data:** You agree to use candidate data accessed through our platform solely for recruitment purposes and to protect the privacy of job seekers in accordance with data protection laws.
+                      </p>
+                      <p>
+                        4. **Prohibited Activities:** You agree not to use the platform for any illegal, harmful, or fraudulent activities, including but not limited to spamming, phishing, or spreading malware.
+                      </p>
+                      <p>
+                        5. **Service Modifications:** We reserve the right to modify or discontinue the service (or any part thereof) with or without notice at any time.
+                      </p>
+                      <p>
+                        6. **Limitation of Liability:** We are not liable for any direct, indirect, incidental, special, consequential, or exemplary damages, including but not limited to, damages for loss of profits, goodwill, data, or other intangible losses.
+                      </p>
+                      <p>
+                        7. **Governing Law:** These terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+                      </p>
+                      <p>
+                        If you do not agree to these terms, please do not proceed with registration.
+                      </p>
+                  </div>
+                  <div class="form-check">
+                      <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="termsAccepted"
+                          name="terms_accepted" {# Important: give it a name for submission #}
+                          required {# HTML5 validation: makes the checkbox required #}
+                      />
+                      <label class="form-check-label" for="termsAccepted">
+                          I have read and agree to the <a href="#terms-of-service" onclick="return false;">Terms of Service</a>
+                          {# The onclick="return false;" prevents default scroll/navigation for a dummy anchor #}
+                      </label>
+                  </div>
+              </div>
+              {# --- END: Terms of Service Section --- #}
+
+              <button type="submit" class="btn btn-primary mt-3">Register Employer</button>
+          </form>
+
+          <hr style="background-color: white; height: 1px;">
+
+        </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
