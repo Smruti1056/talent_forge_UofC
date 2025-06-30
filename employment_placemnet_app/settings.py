@@ -35,7 +35,7 @@ DATABASE_URL = 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq
 DEBUG = True
 
 ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
-#ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 # Application definition
 
