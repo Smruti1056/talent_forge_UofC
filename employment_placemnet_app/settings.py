@@ -34,8 +34,8 @@ DATABASE_URL = 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config('RENDER_EXTERNAL_HOSTNAME', default='127.0.0.1')]
+#ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     # Correct way to add Django REST Framework
     'rest_framework',
     # Django Widjets
-    'widget_tweaks',
+    'widget_tweaks'
     # Correct way to add Django CORS Headers
     'corsheaders',
 ]
@@ -172,6 +172,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 #]
 
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static', 'dist'),
     os.path.join(BASE_DIR, 'talent_forge_frontend', 'dist'),
 ]
 
