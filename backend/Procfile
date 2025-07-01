@@ -1,1 +1,2 @@
-web: gunicorn backend.employment_placemnet_app.wsgi
+
+web: gunicorn backend.employment_placement_app.wsgi
