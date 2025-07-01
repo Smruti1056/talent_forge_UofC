@@ -9,7 +9,7 @@ urlpatterns = [
     #path('admin/', admin.site.urls),
     path("",include('user.urls')),
     path("",include('allauth.urls')),
-    path("",include('employeer.urls')),
+    path("",include('employer.urls')),
     path("",include('job_seeker.urls')),
 ]
 if settings.DEBUG:
