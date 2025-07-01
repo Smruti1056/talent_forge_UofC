@@ -10,6 +10,7 @@
         {% if not request.user.mfa_enabled %}
         <h4>
             Enable 2FA with Authenticator App.
+
         </h4>
             <div> 
                 <img src="{{ qrcode }}" alt="{{ img_path }}">

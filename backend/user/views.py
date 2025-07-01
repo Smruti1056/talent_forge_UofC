@@ -6,6 +6,7 @@ from django.contrib.auth  import get_user_model
 from django.conf import settings
 from .models import CustomUser
 from employer.models import EmployerProfile
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import pyotp
