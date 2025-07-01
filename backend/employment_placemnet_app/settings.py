@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 
-DATABASE_URL = 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq15pdvs73fj2bgg-a.oregon-postgres.render.com/talent_forge_70yy'
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://tf_ad_1:blak9RtsRkYlhHI01vGxMbeqC9Y0KiWG@dpg-d16olq15pdvs73fj2bgg-a.oregon-postgres.render.com/talent_forge_70yy')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -173,7 +173,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'talent_forge_frontend', 'dist'),
+    os.path.join(BASE_DIR.parent, 'frontend', 'talent_forge_frontend', 'dist'),
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
