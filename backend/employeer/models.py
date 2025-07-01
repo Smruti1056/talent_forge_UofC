@@ -13,4 +13,4 @@ class EmployerProfile(models.Model):
     about = models.TextField(blank=True)
 
     def __str__(self):
-        return self.company_name
+        return self.name
