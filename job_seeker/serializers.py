@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    JobSeekerProfile, Education, Certification, Skill, JobSeekerSkill
+    JobSeekerProfile, Education, Certification, Skill, JobSeekerSkill, JobExperience
 )
 from user.models import CustomUser
 
@@ -22,19 +22,42 @@ class SkillSerializer(serializers.ModelSerializer):
         model = Skill
         fields = ['name']
 
+class JobExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobExperience
+        exclude = ('job_seeker',)
+
+class JobSeekerSkillSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='skill.name')  # gets skill.name via foreign key
+
+    class Meta:
+        model = JobSeekerSkill
+        fields = ['name', 'proficiency']
 
 class JobSeekerProfileSerializer(serializers.ModelSerializer):
-    educations = EducationSerializer(many=True)
-    certifications = CertificationSerializer(many=True)
-    skills = serializers.ListField(child=serializers.CharField())
+    educations = EducationSerializer(many=True, read_only=True)
+    certifications = CertificationSerializer(many=True, read_only=True)
+    skills = JobSeekerSkillSerializer(source='jobseekerskill_set', many=True, read_only=True)
+    job_experiences = JobExperienceSerializer(many=True, read_only=True)
 
     class Meta:
         model = JobSeekerProfile
-        exclude = ('user',)  # Assuming you'll set user in the view
+        exclude = ('user',)
+
+class JobSeekerProfileCreateSerializer(serializers.ModelSerializer):
+    educations = EducationSerializer(many=True)
+    certifications = CertificationSerializer(many=True, required=False)
+    skills = serializers.ListField(child=serializers.CharField())
+    job_experiences = JobExperienceSerializer(many=True)
+
+    class Meta:
+        model = JobSeekerProfile
+        exclude = ('user',)
 
     def create(self, validated_data):
         educations_data = validated_data.pop('educations', [])
-        certifications_data = validated_data.pop('certifications', [])
+        certifications_data = validated_data.pop('certifications', None) or []
+        job_experiences_data = validated_data.pop('job_experiences', [])
         skills_data = validated_data.pop('skills', [])
         user = self.context['request'].user
 
@@ -46,14 +69,14 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
             JobSeekerSkill.objects.get_or_create(
                 job_seeker=profile,
                 skill=skill,
-                defaults={'proficiency': 'Beginner'}  # You can make this dynamic later
+                defaults={'proficiency': 'Beginner'}  # Or adjust dynamically
             )
 
         # Handle educations
         for edu_data in educations_data:
             Education.objects.create(job_seeker=profile, **edu_data)
 
-        # Handle certifications
+        # ✅ Handle certifications only if present
         for cert_data in certifications_data:
             Certification.objects.create(job_seeker=profile, **cert_data)
 

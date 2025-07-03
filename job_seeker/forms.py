@@ -10,7 +10,7 @@ class JobSeekerProfileForm(forms.ModelForm):
     class Meta:
         model = JobSeekerProfile
         fields = [
-            'first_name', 'last_name', 'location', 'role', 'email', 'picture',
+            'first_name', 'last_name', 'location', 'role', 'picture',
             'phone_number', 'industry', 'about'
         ]
         widgets = {

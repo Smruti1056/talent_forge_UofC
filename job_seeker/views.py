@@ -4,18 +4,19 @@ from .forms import JobSeekerProfileForm, EducationForm, CertificationForm, JobEx
 from .models import JobSeekerProfile, Skill
 from rest_framework import generics
 from django.conf import settings 
-
+from django.http import JsonResponse
 # views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .serializers import JobSeekerProfileSerializer, SkillSerializer
+from .serializers import JobSeekerProfileSerializer, SkillSerializer, JobSeekerProfileCreateSerializer
 
+@login_required
 def jobseeker_profile_page(request):
     if hasattr(request.user, 'job_seeker_profile'):
         return redirect('job_seeker_dashboard')  # Prevent duplicate profile
 
-    return render(request, 'job_seeker/create_js_profile.html', {'debug': False,})
+    return render(request, 'job_seeker/create_js_profile.html')
 
 class SkillListAPIView(generics.ListAPIView):
     queryset = Skill.objects.all()
@@ -25,14 +26,15 @@ class JobSeekerProfileCreateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        serializer = JobSeekerProfileSerializer(data=request.data, context={'request': request})
+        serializer = JobSeekerProfileCreateSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
-            print(serializer.errors)  # or use logging
+            print(serializer.errors)
         if serializer.is_valid():
             profile = serializer.save()
             return Response({'message': 'Profile created'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@login_required
 def create_job_seeker_profile(request):
     user = request.user
     # Redirect if profile already exists
@@ -46,14 +48,34 @@ def create_job_seeker_profile(request):
             profile.user = user
             profile.save()
             return redirect('job_seeker_dashboard')
-    else:
-        form = JobSeekerProfileForm()
-        edu_formset = EducationForm()
-        cert_formset = CertificationForm()
-        exp_formset = JobExperienceForm()
 
-    return render(request, 'job_seeker/create_js_profile.html', {'job_seeker_form': form, 'edu_formset': edu_formset, 'cert_formset': cert_formset, 'exp_formset': exp_formset,})
+    return render(request, 'job_seeker/create_js_profile.html')
 
+@login_required
 def job_seeker_dashboard(request):
     profile = get_object_or_404(JobSeekerProfile, user=request.user)
     return render(request, 'job_seeker/dashboard.html', {'profile': profile})
+
+class JobSeekerProfileDetailAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        try:
+            profile = JobSeekerProfile.objects.get(user=request.user)
+        except JobSeekerProfile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=404)
+        
+        serializer = JobSeekerProfileSerializer(profile)
+        return Response(serializer.data)
+
+@login_required
+def employer_profile_api(request):
+    profile = get_object_or_404(JobSeekerProfile, user=request.user)
+    print(profile)
+    data = {
+        'first_name': profile.first_name,
+        'last_name': profile.last_name,
+        'email': profile.email,
+        'about': profile.about,
+    }
+    return JsonResponse(data)

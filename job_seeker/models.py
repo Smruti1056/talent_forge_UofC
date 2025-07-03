@@ -8,7 +8,6 @@ class JobSeekerProfile(models.Model):
     last_name = models.CharField(max_length=150)
     location = models.CharField(max_length=255)  # can be city, region, etc.
     role = models.CharField(max_length=100)  # title like 'Software Engineer', 'Data Analyst', etc.
-    email = models.EmailField(max_length=254)  # ✅ use EmailField for validation
     picture = models.ImageField(upload_to='job_seeker_profile/', blank=True)
     phone_number = models.CharField(max_length=20)  # country code + local (e.g., +1-234-567-8901)
     industry = models.CharField(max_length=100)  # e.g., 'Finance', 'IT', etc.

@@ -53,7 +53,6 @@ def profile_view(request):
            return redirect('employer_dashboard')
     elif user.user_type == '1':
         if not hasattr(user, 'jobseekerprofile'):
-            print("TEST JOB SEEKER")
             return redirect('create_jobseeker_profile')
     qr_code_data_uri = generate_otp(user)
     is_employer = hasattr(user, 'employerprofile')

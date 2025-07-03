@@ -20,10 +20,23 @@ type Certification = {
   credential_url: string;
 };
 
+type Skill = {
+  id: string;
+  name: string;
+};
+
+type JobExperience = {
+  company_name: string;
+  position: string;
+  start_date: string;
+  end_date: string;
+  location: string;
+  responsibilities: string;
+};
+
 type JobSeekerProfileFormData = {
   first_name: string;
   last_name: string;
-  email: string;
   phone_number: string;
   location: string;
   role: string;
@@ -32,11 +45,7 @@ type JobSeekerProfileFormData = {
   skills: string[]; // IDs of skills
   educations: Education[];
   certifications: Certification[];
-};
-
-type Skill = {
-  id: string;
-  name: string;
+  job_experiences: JobExperience[];
 };
 
 type Props = {
@@ -127,13 +136,12 @@ const SkillInput: React.FC<Props> = ({ allSkills, onSkillsChange }) => {
 }
 
 const JobSeekerProfileForm: React.FC = () => {
-
+  
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<JobSeekerProfileFormData>({
     first_name: '',
     last_name: '',
-    email: '',
     phone_number: '',
     location: '',
     role: '',
@@ -154,7 +162,15 @@ const JobSeekerProfileForm: React.FC = () => {
       issue_date: '',
       expiration_date: '',
       credential_url: '',
-    }]
+    }],
+    job_experiences: [{
+    company_name: '',
+    position: '',
+    start_date: '',
+    end_date: '',
+    location: '',
+    responsibilities: '',
+  }],
   });
 
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
@@ -184,7 +200,7 @@ const JobSeekerProfileForm: React.FC = () => {
     }
   };
 
-  const addSection = (section: 'educations' | 'certifications') => {
+  const addSection = (section: 'educations' | 'certifications' | 'job_experiences') => {
     const blankItem = Object.fromEntries(Object.keys(formData[section][0]).map(k => [k, '']));
     setFormData(prev => ({
       ...prev,
@@ -192,7 +208,7 @@ const JobSeekerProfileForm: React.FC = () => {
     }));
   };
 
-  const removeSection = (section: 'educations' | 'certifications', index: number) => {
+  const removeSection = (section: 'educations' | 'certifications' | 'job_experiences', index: number) => {
     if (index === 0) return; // ❌ Don't allow deleting the first one
     const updated = [...formData[section]];
     updated.splice(index, 1);
@@ -230,7 +246,15 @@ const JobSeekerProfileForm: React.FC = () => {
       return dateStr.split('T')[0]; // If ISO string like "2025-06-20T00:00:00"
     };
 
-    const cleanedCerts = formData.certifications.map(cert => ({
+    const cleanedCerts = formData.certifications
+    .filter(cert =>
+      cert.name.trim() !== '' ||
+      cert.issuer.trim() !== '' ||
+      cert.issue_date.trim() !== '' ||
+      cert.expiration_date.trim() !== '' ||
+      cert.credential_url.trim() !== ''
+    )
+    .map(cert => ({
       ...cert,
       issue_date: normalizeDate(cert.issue_date),
       expiration_date: normalizeDate(cert.expiration_date),
@@ -242,10 +266,18 @@ const JobSeekerProfileForm: React.FC = () => {
       end_date: normalizeDate(edu.end_date),
     }));
 
+    const cleanedExperiences = formData.job_experiences.map(exp => ({
+      ...exp,
+      start_date: normalizeDate(exp.start_date),
+      end_date: normalizeDate(exp.end_date),
+    }));
+
+
     const payload = {
       ...formData,
       certifications: cleanedCerts,
       educations: cleanedEducations,
+      job_experiences: cleanedExperiences,
     };
 
     axios.post('/api/jobseeker/create/', payload, {
@@ -302,9 +334,9 @@ const JobSeekerProfileForm: React.FC = () => {
           <div className="row"> {/* This 'row' will contain your two form-groups */}
             <div className="col-md-6"> {/* First column, takes up half width on medium and larger screens */}
               <div className="form-group row"> {/* Original form-group for Email */}
-                <label htmlFor="email" className="col-sm-2 col-form-label">Email: </label>
+                <label htmlFor="location" className="col-sm-2 col-form-label">Location: </label>
                 <div className="col-sm-10">
-                  <input className="form-control" type="email" placeholder="Email" value={formData.email} onChange={e => handleChange(e, 'email')} />
+                  <input className="form-control" placeholder="Location" value={formData.location} onChange={e => handleChange(e, 'location')} />
                 </div>
               </div>
             </div>
@@ -321,9 +353,9 @@ const JobSeekerProfileForm: React.FC = () => {
           <div className="row"> {/* This 'row' will contain your two form-groups */}
             <div className="col-md-6"> {/* First column, takes up half width on medium and larger screens */}
               <div className="form-group row"> {/* Original form-group for Email */}
-                <label htmlFor="location" className="col-sm-2 col-form-label">Location: </label>
+                <label htmlFor="insdustry" className="col-sm-2 col-form-label">Industry: </label>
                 <div className="col-sm-10">
-                  <input className="form-control" placeholder="Location" value={formData.location} onChange={e => handleChange(e, 'location')} />
+                  <input className="form-control" placeholder="Industry" value={formData.industry} onChange={e => handleChange(e, 'industry')} />
                 </div>
               </div>
             </div>
@@ -338,15 +370,7 @@ const JobSeekerProfileForm: React.FC = () => {
           </div>
           <hr></hr>
           <div className="row"> {/* This 'row' will contain your two form-groups */}
-            <div className="col-md-6"> {/* First column, takes up half width on medium and larger screens */}
-              <div className="form-group row"> {/* Original form-group for Email */}
-                <label htmlFor="insdustry" className="col-sm-2 col-form-label">Industry: </label>
-                <div className="col-sm-10">
-                  <input className="form-control" placeholder="Industry" value={formData.industry} onChange={e => handleChange(e, 'industry')} />
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6"> {/* Second column, takes up half width on medium and larger screens */}
+            <div className="col-md-12"> {/* Second column, takes up half width on medium and larger screens */}
               <div className="form-group row"> {/* Original form-group for Password */}
               <label htmlFor="about" className="col-sm-2 col-form-label">About: </label>
                 <div className="col-sm-10">
@@ -364,6 +388,88 @@ const JobSeekerProfileForm: React.FC = () => {
             setFormData({ ...formData, skills });
           }}
         />
+
+        {/* Job Experience Section */}
+        <div className="mb-4 p-3 border rounded bg-light">
+          <h3 className="mb-3">Job Experience</h3>
+          <hr />
+          {formData.job_experiences.map((exp, i) => (
+            <div key={i}>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">Company:</label>
+                    <div className="col-sm-9">
+                      <input className="form-control" placeholder="Company Name" value={exp.company_name} onChange={e => handleChange(e, 'company_name', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">Position:</label>
+                    <div className="col-sm-9">
+                      <input className="form-control" placeholder="Position" value={exp.position} onChange={e => handleChange(e, 'position', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row mt-2">
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">Start Date:</label>
+                    <div className="col-sm-9">
+                      <input className="form-control" type="date" value={exp.start_date} onChange={e => handleChange(e, 'start_date', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">End Date:</label>
+                    <div className="col-sm-9">
+                      <input className="form-control" type="date" value={exp.end_date} onChange={e => handleChange(e, 'end_date', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row mt-2">
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">Location:</label>
+                    <div className="col-sm-9">
+                      <input className="form-control" placeholder="Location" value={exp.location} onChange={e => handleChange(e, 'location', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-group row">
+                    <label className="col-sm-3 col-form-label">Responsibilities:</label>
+                    <div className="col-sm-9">
+                      <textarea className="form-control" placeholder="Responsibilities" value={exp.responsibilities} onChange={e => handleChange(e, 'responsibilities', i, 'job_experiences')} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row mt-3">
+                <div className="col-md-4">
+                  {i > 0 && (
+                    <button type="button" className="btn btn-danger" 
+                      onClick={() => removeSection('job_experiences', i)}>
+                      ✕ Remove Experience
+                    </button>
+                  )}
+                </div>
+              </div>
+              <hr />
+            </div>
+          ))}
+          <button className="btn btn-secondary" type="button" onClick={() => addSection('job_experiences')}>
+            + Add Job Experience
+          </button>
+        </div>
+
         {/* Education Section */}
         <div className="mb-4 p-3 border rounded bg-light">
           <h3 className="mb-3">Education</h3>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import jobseeker_profile_page, JobSeekerProfileCreateAPIView, SkillListAPIView
+from .views import jobseeker_profile_page, JobSeekerProfileCreateAPIView, SkillListAPIView, JobSeekerProfileDetailAPIView
 from . import views
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     # This is the API React POSTs to
     path('api/jobseeker/create/', JobSeekerProfileCreateAPIView.as_view(), name='api_create_jobseeker_profile'),
     path('api/skills/', SkillListAPIView.as_view(), name='skills-list'),
+    path('api/jobseeker/profile/', JobSeekerProfileDetailAPIView.as_view(), name='jobseeker-profile'),
 ]
